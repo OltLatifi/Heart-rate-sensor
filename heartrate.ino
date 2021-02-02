@@ -1,6 +1,37 @@
-int sensorPin = 2;
-int buzzer = 4;
+#include <LiquidCrystal.h>
 
+
+int sensorPin = 1;
+int buzzer = 0;
+
+
+
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+
+
+byte customChar[] = {
+  B00000,
+  B01010,
+  B11111,
+  B11111,
+  B11111,
+  B01110,
+  B00100,
+  B00000
+};
+
+
+byte customChar2[] = {
+  B00000,
+  B00000,
+  B00000,
+  B00000,
+  B00000,
+  B00000,
+  B00000,
+  B00000
+};
 
 double alpha = 0.025;
 // the delay
@@ -18,29 +49,47 @@ int length_ = 15;
 double old_value = 0;
 double value = 0;
 
+
 void setup() {
    Serial.begin(9600);
+   lcd.begin(16, 2);
+   
+  lcd.createChar(0, customChar);
+  lcd.home();
+  lcd.write((byte)0);
    
 }
 void loop ()
 { 
+  lcd.setCursor(2, 0);
+  
   if(index_ == length_){
     
     median = median/length_;
     Serial.print(median);
     Serial.print('\n');
+    lcd.print("Heart rate ");
+    lcd.print(int(round(median)));
 
 
     if(median>remember_median){
-    
-      tone(buzzer,1000);
-    }else{
+
       noTone(buzzer);
+      lcd.createChar(0, customChar);
+      lcd.home();
+      lcd.write((byte)0);
+  
+    }else{
+      tone(buzzer,1000);
+      lcd.createChar(0, customChar2);
+      lcd.home();
+      lcd.write((byte)0);
     }
     remember_median = median;
     old_value = value;
     delay(period);
     index_ = 0;
+    delay(10);
   }
   index_++;
   
